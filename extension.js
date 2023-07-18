@@ -792,39 +792,42 @@ class PidginClient extends GObject.Object {
 		this._deleteConversationId = this._proxy.connectSignal('DeletingConversation', this._onDeleteConversation.bind(this));
 		this._conversationUpdatedId = this._proxy.connectSignal('ConversationUpdated', this._onConversationUpdated.bind(this));
 
-		// existing conversations
-		try {
-			let conversations = this._proxy.PurpleGetImsSync().toString().split(',');
-			for (let i in conversations) {
-				let conv = conversations[i];
-				if (!conv || conv == null) continue;
-				let messages = this._proxy.PurpleConversationGetMessageHistorySync(conv).toString().split(',');
-				let history = [];
-				let account = this._proxy.PurpleConversationGetAccountSync(conv);
-				for (let x in messages) {
-					let mess = messages[x];
-					if (!mess || mess == null) continue;
-					history.push({
-						conv: conv,
-						account: account,
-						author: this._proxy.PurpleConversationMessageGetSenderSync(mess).toString(),
-						text: this._proxy.PurpleConversationMessageGetMessageSync(mess),
-						flag: this._proxy.PurpleConversationMessageGetFlagsSync(mess),
-						timestamp: this._proxy.PurpleConversationMessageGetTimestampSync(mess)
-					});
-				}
-				if (history.length == 0) continue;
-				history = history.sort(function(m1, m2) {
-					return m1.timestamp - m2.timestamp;
-				});
-				for (let x in history) {
-					let h = history[x];
-					this._handleMessage(h.account, h.author, h.text, h.conv, h.flag, h.timestamp, false);
-				}
-			}
-		} catch (e) {
-			log(e);
-		}
+        // !mwd - disabling grabbing the history when re-enabled.
+        //   This is annoying, since every time the screen is unlocked,
+        //   the plugin is re-enabled.
+		// // existing conversations
+		// try {
+		// 	let conversations = this._proxy.PurpleGetImsSync().toString().split(',');
+		// 	for (let i in conversations) {
+		// 		let conv = conversations[i];
+		// 		if (!conv || conv == null) continue;
+		// 		let messages = this._proxy.PurpleConversationGetMessageHistorySync(conv).toString().split(',');
+		// 		let history = [];
+		// 		let account = this._proxy.PurpleConversationGetAccountSync(conv);
+		// 		for (let x in messages) {
+		// 			let mess = messages[x];
+		// 			if (!mess || mess == null) continue;
+		// 			history.push({
+		// 				conv: conv,
+		// 				account: account,
+		// 				author: this._proxy.PurpleConversationMessageGetSenderSync(mess).toString(),
+		// 				text: this._proxy.PurpleConversationMessageGetMessageSync(mess),
+		// 				flag: this._proxy.PurpleConversationMessageGetFlagsSync(mess),
+		// 				timestamp: this._proxy.PurpleConversationMessageGetTimestampSync(mess)
+		// 			});
+		// 		}
+		// 		if (history.length == 0) continue;
+		// 		history = history.sort(function(m1, m2) {
+		// 			return m1.timestamp - m2.timestamp;
+		// 		});
+		// 		for (let x in history) {
+		// 			let h = history[x];
+		// 			this._handleMessage(h.account, h.author, h.text, h.conv, h.flag, h.timestamp, false);
+		// 		}
+		// 	}
+		// } catch (e) {
+		// 	log(e);
+		// }
 		this._messageTrayIntegration = true;
 	}
 
